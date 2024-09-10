@@ -1,0 +1,45 @@
+#include <Servo.h>
+#include <ESP8266WiFi.h>              // Use <WiFi.h> if you're using ESP32
+#include <BlynkSimpleEsp8266.h>       // Use <BlynkSimpleEsp32.h> if you're using ESP32
+
+// Replace with your WiFi network credentials
+char ssid[] = "YourWiFiSSID";         // Your WiFi SSID
+char pass[] = "YourWiFiPassword";     // Your WiFi Password
+
+// Replace with your Blynk Auth Token
+char auth[] = "YourBlynkAuthToken";   // Auth Token from the Blynk App
+
+Servo fishFeederServo;                // Create a Servo object
+
+void setup() {
+  Serial.begin(115200);               // Start serial communication at 115200 baud rate
+  Blynk.begin(auth, ssid, pass);      // Initialize Blynk with Auth Token, SSID, and Password
+
+  fishFeederServo.attach(D1);         // Attach the servo to GPIO pin D1 (for ESP8266) or any GPIO pin (for ESP32)
+}
+
+// Function to feed fish based on the angle input
+void feedFish(int angle) {
+  fishFeederServo.write(angle);       // Rotate the servo to the specified angle
+  delay(1000);                        // Hold the position for 1 second
+  fishFeederServo.write(0);           // Return the servo to its initial position
+}
+
+// Blynk button function for Small Fish feeding
+BLYNK_WRITE(V1) {
+  feedFish(30);                       // Dispense a small amount of food
+}
+
+// Blynk button function for Large Fish feeding
+BLYNK_WRITE(V2) {
+  feedFish(60);                       // Dispense a larger amount of food
+}
+
+// Blynk button function for Other types of fish feeding
+BLYNK_WRITE(V3) {
+  feedFish(45);                       // Dispense a medium amount of food
+}
+
+void loop() {
+  Blynk.run();                        // Run the Blynk client
+}
